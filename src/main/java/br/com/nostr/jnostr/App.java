@@ -39,8 +39,8 @@ public class App
     
     public static void main( String[] args ) {
         System.out.println("Java Version: " + NostrUtil.getJavaVersion());
-        Jnostr jnostr = new Jnostr();
-        jnostr.initialize(NostrUtil.toHex(NostrUtil.generatePrivateKey()),"relay.taxi");
+        JNostr jnostr = JNostrFactory.getInstance(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
+        jnostr.initialize("relay.taxi");
         try {
             CountDownLatch latch = new CountDownLatch(1);
             String relay = "relay.taxi";

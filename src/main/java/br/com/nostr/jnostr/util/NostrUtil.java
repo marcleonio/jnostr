@@ -115,7 +115,7 @@ public class NostrUtil {
         // return Base64.getEncoder().encodeToString(s);
 
 
-        Signature signature = Signature.getInstance("SHA256withRSA");
+        Signature signature = Signature.getInstance("SHA256withECDSAinP1363format");
         signature.initSign(privateKey);
 
         byte[] messageBytes = sha256(id);

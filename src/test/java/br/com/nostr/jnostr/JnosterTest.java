@@ -14,12 +14,12 @@ public class JnosterTest extends BaseTest{
 
     private String jsonNIP01;
 
-    private Jnostr jnostr;
+    private JNostr jnostr;
 
     @Before
     public void init(){
-        jnostr = new Jnostr();
-        jnostr.initialize(NostrUtil.toHex(NostrUtil.generatePrivateKey()),"relay.taxi");
+        jnostr = new JNostr(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
+        jnostr.initialize("relay.taxi");
     }
 
     @Test
