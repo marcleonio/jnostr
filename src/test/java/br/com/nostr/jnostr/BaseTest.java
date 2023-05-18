@@ -2,6 +2,7 @@ package br.com.nostr.jnostr;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,11 +11,13 @@ import br.com.nostr.jnostr.crypto.schnorr.Schnorr;
 import br.com.nostr.jnostr.enums.TypeClientEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.EventMessage;
+import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
 import br.com.nostr.jnostr.nip.Event;
 import br.com.nostr.jnostr.nip.ReqMessage;
 import br.com.nostr.jnostr.tags.TagP;
 import br.com.nostr.jnostr.util.NostrUtil;
+import jakarta.validation.Valid;
 
 public class BaseTest {
     
@@ -51,5 +54,16 @@ public class BaseTest {
         return message;
     }
 
-    
+    @Valid
+    protected Message createReqMessage() {
+
+        ReqMessage message = new ReqMessage();
+        message.setSubscriptionId(UUID.randomUUID().toString());
+        Filters filter = new Filters();
+        filter.setKinds(Arrays.asList(1));
+        filter.setLimit(100);
+        message.setFilters(filter);
+
+        return message;
+    }
 }

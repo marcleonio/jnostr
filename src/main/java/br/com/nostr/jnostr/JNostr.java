@@ -103,12 +103,14 @@ class JNostr {
         try {
             //TODO verificar se é melhor com customJackson ou enviar em lista
             // List<String> jsonList = new ArrayList<>();
-            // jsonList.add("\"" + TypeClientEnum.EVENT.name() + "\"");
-            // jsonList.add(mapper.writeValueAsString(messages.getMessages().get(0).getNip()));
+            // jsonList.add("\"" + messages.getMessages().get(0).getType().name() + "\"");
+            // jsonList.add(mapper.writeValueAsString(messages.getMessages().get(0).getEvent()));
             // System.out.println(jsonList.toString());
         
             var json = mapper.writeValueAsString(messages);
             if(connectedRelay!=null) {
+                List<?> obj = mapper.readValue(json.toString(), List.class);
+
                 connectedRelay.sendText(json, true);
                 wsc.getLatch().await();
                 return wsc.getData();

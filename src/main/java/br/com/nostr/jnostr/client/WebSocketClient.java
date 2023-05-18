@@ -53,8 +53,8 @@ public class WebSocketClient implements WebSocket.Listener {
 
         System.out.println("onText received " + data);
         if(last){
-            latch.countDown();
             this.data = data.toString();
+            latch.countDown();
         }
         // return WebSocket.Listener.super.onText(webSocket, data, last);
 
@@ -71,6 +71,7 @@ public class WebSocketClient implements WebSocket.Listener {
         CompletableFuture<WebSocket> server_cf = HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(
                 URI.create(connection), this);
                 latch = new CountDownLatch(1);
+                this.data = null;
         return server_cf.join();
     }
 

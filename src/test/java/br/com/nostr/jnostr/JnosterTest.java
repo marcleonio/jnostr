@@ -11,8 +11,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.server.RelayToClient;
 import br.com.nostr.jnostr.util.NostrUtil;
+import jakarta.validation.Valid;
 
 public class JnosterTest extends BaseTest{
     // private final StringPadderImpl stringPadder = new StringPadderImpl();
@@ -36,7 +38,7 @@ public class JnosterTest extends BaseTest{
     }
   
     @Test
-    public void nip01() throws JsonMappingException, JsonProcessingException {
+    public void nip01EVENT() throws JsonMappingException, JsonProcessingException {
         var data = jnostr.sendMessage(createEventMessage());
 
         
@@ -45,6 +47,13 @@ public class JnosterTest extends BaseTest{
         
         assertEquals("OK",list.get(0));
         assertEquals("[\"OK\"",data.split(",")[0]);
+    }
+
+    @Test
+    public void nip01REQ() {
+        var data = jnostr.sendMessage(createReqMessage());
+        
+        assertEquals("[\"EVENT\"",data.split(",")[0]);
     }
 
     @Test

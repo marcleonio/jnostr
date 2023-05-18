@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Message;
+import br.com.nostr.jnostr.nip.ReqMessage;
 
 public class CustomClientSerializer extends JsonSerializer <ClientToRelay>{
 
@@ -35,11 +36,18 @@ public class CustomClientSerializer extends JsonSerializer <ClientToRelay>{
            
             try {
                 BeanUtils.getProperty(message,field.getName());
-                gen.writePOJO( ((EventMessage) message).getEvent());
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+
+        if(message instanceof EventMessage){
+            gen.writePOJO( ((EventMessage) message).getEvent());
+        }
+        if(message instanceof ReqMessage){
+            gen.writePOJO( ((ReqMessage) message).getSubscriptionId());
+            gen.writePOJO( ((ReqMessage) message).getFilters());
         }
         
         gen.writeEndArray();
