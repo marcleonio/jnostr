@@ -7,8 +7,26 @@ import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CountDownLatch;
 
+import lombok.Getter;
+
+@Getter
 public class WebSocketClient implements WebSocket.Listener {
+
+    private String data;
+    private CountDownLatch latch;
+
+    @Override
+    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+        // TODO Auto-generated method stub
+        // return Listener.super.onClose(arg0, arg1, arg2);
+        // webSocket.sendClose(CUSTOM_STATUS_CODE, CUSTOM_REASON);
+        webSocket.sendClose(statusCode, reason);
+        latch.countDown();
+        return new CompletableFuture<Void>();
+    }
+
     // Insert Body here
     @Override
     public void onOpen(WebSocket webSocket) {
@@ -34,7 +52,13 @@ public class WebSocketClient implements WebSocket.Listener {
         // return Listener.super.onText(webSocket, data, last);
 
         System.out.println("onText received " + data);
-        return WebSocket.Listener.super.onText(webSocket, data, last);
+        if(last){
+            latch.countDown();
+            this.data = data.toString();
+        }
+        // return WebSocket.Listener.super.onText(webSocket, data, last);
+
+        return new CompletableFuture(). completedStage(data);
     }
 
     @Override
@@ -45,9 +69,12 @@ public class WebSocketClient implements WebSocket.Listener {
 
     public WebSocket startSocket(String connection) {
         CompletableFuture<WebSocket> server_cf = HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(
-                URI.create(connection),
-                new WebSocketClient());
- 
+                URI.create(connection), this);
+                latch = new CountDownLatch(1);
         return server_cf.join();
+    }
+
+    public void setLatch(CountDownLatch countDownLatch) {
+        this.latch = countDownLatch;
     }
 }

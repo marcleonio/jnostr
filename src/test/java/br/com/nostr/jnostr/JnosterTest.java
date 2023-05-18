@@ -1,12 +1,17 @@
 package br.com.nostr.jnostr;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import br.com.nostr.jnostr.server.RelayToClient;
 import br.com.nostr.jnostr.util.NostrUtil;
 
 public class JnosterTest extends BaseTest{
@@ -31,14 +36,15 @@ public class JnosterTest extends BaseTest{
     }
   
     @Test
-    public void nip01() {
-        jsonNIP01 = createNIP01();
-        jnostr.sendMessage("relay.taxi", jsonNIP01);
+    public void nip01() throws JsonMappingException, JsonProcessingException {
+        var data = jnostr.sendMessage(createEventMessage());
 
-        jnostr.sendMessage("Hello world, I'm here on JNostr API!");
-
-        assertNotNull(jsonNIP01);
-
+        
+        ObjectMapper mapper = new ObjectMapper();
+        List<?> list = mapper.readValue(data.toString(), List.class);
+        
+        assertEquals("OK",list.get(0));
+        assertEquals("[\"OK\"",data.split(",")[0]);
     }
 
     @Test

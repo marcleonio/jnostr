@@ -1,16 +1,15 @@
 package br.com.nostr.jnostr.nip;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import br.com.nostr.jnostr.enums.TypeClientEnum;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 @Data
-public class Message {
+public abstract class Message {
     
+    @Setter(AccessLevel.NONE)
     private TypeClientEnum type;
-    @JsonProperty("subscription_id")
-    private String subscriptionId;
-    private Nip nip;
-    private Filters filters;
+
+    public abstract TypeClientEnum getType();
 }

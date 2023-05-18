@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -22,17 +24,22 @@ import br.com.nostr.jnostr.client.WebSocketClient;
 import br.com.nostr.jnostr.crypto.schnorr.Schnorr;
 import br.com.nostr.jnostr.enums.TypeClientEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
+import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Message;
-import br.com.nostr.jnostr.nip.Nip;
+import br.com.nostr.jnostr.nip.Event;
+import br.com.nostr.jnostr.nip.ReqMessage;
 import br.com.nostr.jnostr.server.RelayInfo;
 import br.com.nostr.jnostr.tags.TagP;
 import br.com.nostr.jnostr.util.NostrUtil;
+import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 
 @Log
 class JNostr {
 
-    private WebSocket server;
+    
+    private WebSocketClient wsc = new WebSocketClient();
+    private WebSocket connectedRelay;
     private String privateKey;
     private String[] relays;
 
@@ -46,8 +53,10 @@ class JNostr {
 
     public JNostr initialize(String ... relays){
         Objects.requireNonNull(relays, "null relay");
-        WebSocketClient wsc = new WebSocketClient();
-        this.server = wsc.startSocket("wss://"+relays[0]);
+        // this.wsc = new WebSocketClient();
+        this.connectedRelay = wsc.startSocket("wss://"+relays[0]);
+
+        // wsc.onText(connectedRelay, privateKey, false)
         this.relays = relays;
         return this;
     }
@@ -75,22 +84,21 @@ class JNostr {
         
     }
 
-    public WebSocket connectRelay(String relay){
-        WebSocketClient wsc = new WebSocketClient();
-        this.server = wsc.startSocket("wss://"+relay);
+    public JNostr connectRelay(String relay){
+        // this.wsc = new WebSocketClient();
+        this.connectedRelay = wsc.startSocket("wss://"+relay);
 
-        return server;
+        return this;
     }
 
     public void sendMessage(String relay, ClientToRelay messages)  {
         
-        server = connectRelay(relay);
-
+        connectRelay(relay);
         sendMessage(messages);
 
     }
 
-    public void sendMessage(ClientToRelay messages) {
+    public String sendMessage(@Valid ClientToRelay messages) {
         ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
         try {
             //TODO verificar se é melhor com customJackson ou enviar em lista
@@ -100,94 +108,83 @@ class JNostr {
             // System.out.println(jsonList.toString());
         
             var json = mapper.writeValueAsString(messages);
-            if(server!=null) {
-                server.sendText(json, true);
+            if(connectedRelay!=null) {
+                connectedRelay.sendText(json, true);
+                wsc.getLatch().await();
+                return wsc.getData();
             } else {
-                throw new RuntimeException("server not found");
+                throw new RuntimeException("relay not found");
             }
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void sendMessage(String relay, String content) {
-        ObjectMapper mapper = new ObjectMapper();
-        server = connectRelay(relay);
-        ClientToRelay messages = null;
-        try {
-            messages = mapper.readValue(content, ClientToRelay.class);
-        } catch (Exception e) {}
+    // public void sendMessage(String relay, Event nip) {
+    //         connectRelay(relay);
+    //         sendMessage(nip);
+    // }
 
-        if(messages==null){
-            sendMessage(content);
-        }else{
-            sendMessage(messages);
-        }
-    }
+    // public void sendMessage(Event nip) {
+    //     try {
+        
+    //         byte[] privkey = NostrUtil.hexToBytes(privateKey);
+    //         String pubkey = NostrUtil.bigIntFromBytes(NostrUtil.genPubKey(privkey)).toString(16);
 
-    public void sendMessage(String content) {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        ClientToRelay messages = null;
-        try {
-            messages = mapper.readValue(content, ClientToRelay.class);
-        } catch (Exception e) {}
-
-        if(messages==null){
-            Nip nip = new Nip();
-            nip.setKind(1);
-            nip.setContent(content);
+    //         nip.setPubkey(pubkey);
+    //         nip.setCreatedAt(Instant.now().getEpochSecond());
+    //         nip.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
             
-            sendMessage(nip);
-        }else{
-            sendMessage(messages);
-        }
-        
+    //         nip.setId(NostrUtil.bytesToHex(NostrUtil.sha256(nip.serialize())));
+
+    //         var signed = Schnorr.sign(NostrUtil.sha256(nip.serialize()), privkey, NostrUtil.createRandomByteArray(32));
+
+    //         nip.setSig(NostrUtil.bytesToHex(signed));
+
+    //         var messages = new ClientToRelay();
+    //         EventMessage message = new EventMessage();
+    //         message.setNip(nip);
+    //         messages.setMessages(Arrays.asList(message));
+
+    //         sendMessage(messages);
+
+    //     } catch (Exception e) {
+    //         throw new RuntimeException(e);
+    //     }
+
+    // }
+
+    public void sendMessage(String relay, @Valid Message message) {
+        connectRelay(relay);
+        sendMessage(message);
     }
 
-    public void sendMessage(String relay, Nip nip) {
-        try {
-        
-            server = connectRelay(relay);
+    public String sendMessage(@Valid Message message) {
+        var messages = new ClientToRelay();
 
-            sendMessage(nip);
+        if(message instanceof EventMessage){
+            var event = ((EventMessage)message).getEvent();
+            event.setCreatedAt(Instant.now().getEpochSecond());
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public void sendMessage(Nip nip) {
-        try {
-        
             byte[] privkey = NostrUtil.hexToBytes(privateKey);
             String pubkey = NostrUtil.bigIntFromBytes(NostrUtil.genPubKey(privkey)).toString(16);
 
-            nip.setPubkey(pubkey);
-            nip.setCreatedAt(Instant.now().getEpochSecond());
-            nip.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
-            
-            nip.setId(NostrUtil.bytesToHex(NostrUtil.sha256(nip.serialize())));
+            event.setPubkey(pubkey);
+            event.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
+            event.setId(NostrUtil.bytesToHex(NostrUtil.sha256(event.serialize())));
 
-            var signed = Schnorr.sign(NostrUtil.sha256(nip.serialize()), privkey, NostrUtil.createRandomByteArray(32));
-
-            nip.setSig(NostrUtil.bytesToHex(signed));
-
-            var messages = new ClientToRelay();
-            Message message = new Message();
-            message.setType(TypeClientEnum.EVENT);
-            message.setNip(nip);
-            messages.setMessages(Arrays.asList(message));
-
-            sendMessage(messages);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            var signed = Schnorr.sign(NostrUtil.sha256(event.serialize()), privkey, NostrUtil.createRandomByteArray(32));
+            event.setSig(NostrUtil.bytesToHex(signed));
         }
 
+
+        messages.setMessages(Arrays.asList(message));
+        return sendMessage(messages);
     }
+
+    
+
+    
 
 
 }
