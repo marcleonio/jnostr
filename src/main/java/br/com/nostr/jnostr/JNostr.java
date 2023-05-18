@@ -91,14 +91,7 @@ class JNostr {
         return this;
     }
 
-    public void sendMessage(String relay, ClientToRelay messages)  {
-        
-        connectRelay(relay);
-        sendMessage(messages);
-
-    }
-
-    public String sendMessage(@Valid ClientToRelay messages) {
+    private String sendMessage(@Valid ClientToRelay messages) {
         ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
         try {
             //TODO verificar se é melhor com customJackson ou enviar em lista

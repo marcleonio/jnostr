@@ -59,7 +59,7 @@ public class App
         }
     }
 
-    private static ClientToRelay nip01()
+    private static Message nip01()
             throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, Exception {
         var privateKey = NostrUtil.generatePrivateKey();
         String pubkey = NostrUtil.bigIntFromBytes(NostrUtil.genPubKey(privateKey)).toString(16);
@@ -82,7 +82,7 @@ public class App
         message.setEvent(event);
         messages.setMessages(Arrays.asList(message));
 
-        return messages;
+        return message;
     }
 
 }
