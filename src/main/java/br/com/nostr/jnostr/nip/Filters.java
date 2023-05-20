@@ -16,8 +16,8 @@ public class Filters {
     List<String> e;
     @JsonProperty("#p")
     List<String> p;
-    Integer since;
-    Integer until;
+    Long since;
+    Long until;
     Integer limit;
 
 }

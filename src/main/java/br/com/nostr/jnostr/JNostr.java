@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,6 +106,7 @@ class JNostr {
                 List<?> obj = mapper.readValue(json.toString(), List.class);
 
                 connectedRelay.sendText(json, true);
+                connectedRelay.sendPing(ByteBuffer.wrap("".getBytes()));
                 wsc.getLatch().await();
                 return wsc.getData();
             } else {

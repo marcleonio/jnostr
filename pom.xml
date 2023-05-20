@@ -9,7 +9,6 @@
   <version>1.0</version>
 
   <name>jnostr</name>
-  <!-- FIXME change it to the project's website -->
   <description>
     A nostr client library, written in java, for generating, signing and publishing events.
   </description>
@@ -146,23 +145,15 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>4.2.0</version>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
-    <plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <plugin>

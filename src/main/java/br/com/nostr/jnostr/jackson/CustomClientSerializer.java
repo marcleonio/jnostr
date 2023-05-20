@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import br.com.nostr.jnostr.nip.ClientToRelay;
+import br.com.nostr.jnostr.nip.CloseMessage;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Message;
 import br.com.nostr.jnostr.nip.ReqMessage;
@@ -44,10 +45,13 @@ public class CustomClientSerializer extends JsonSerializer <ClientToRelay>{
 
         if(message instanceof EventMessage){
             gen.writePOJO( ((EventMessage) message).getEvent());
-        }
-        if(message instanceof ReqMessage){
+        } else
+        if(tagFields[0].getName().equals("filters") ){
             gen.writePOJO( ((ReqMessage) message).getSubscriptionId());
             gen.writePOJO( ((ReqMessage) message).getFilters());
+        }
+        else {
+            gen.writePOJO( ((CloseMessage) message).getSubscriptionId());
         }
         
         gen.writeEndArray();

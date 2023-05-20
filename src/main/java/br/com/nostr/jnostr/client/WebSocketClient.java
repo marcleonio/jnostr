@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
 
+import br.com.nostr.jnostr.util.NostrUtil;
 import lombok.Getter;
 
 @Getter
@@ -50,21 +51,44 @@ public class WebSocketClient implements WebSocket.Listener {
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         // TODO Auto-generated method stub
         // return Listener.super.onText(webSocket, data, last);
-
         System.out.println("onText received " + data);
+
         if(last){
             this.data = data.toString();
-            latch.countDown();
+            if(this.data.contains("EOSE")){
+                latch.countDown();
+            }else{
+                webSocket.request(1);
+            }
         }
+
+        return CompletableFuture.completedFuture(data)
+          .thenAccept(o -> System.out.println("Handling data: " + o));
+
+       
         // return WebSocket.Listener.super.onText(webSocket, data, last);
 
-        return new CompletableFuture(). completedStage(data);
+        // return new CompletableFuture(). completedStage(data);
     }
 
     @Override
-    public CompletionStage<?> onPong(java.net.http.WebSocket arg0, ByteBuffer arg1) {
+    public CompletionStage<?> onBinary(WebSocket arg0, ByteBuffer arg1, boolean arg2) {
         // TODO Auto-generated method stub
+        return Listener.super.onBinary(arg0, arg1, arg2);
+    }
+
+    @Override
+    public CompletionStage<?> onPong(WebSocket arg0, ByteBuffer arg1) {
+        
+        System.out.println("Pong received with data: " + new String(arg1.array()));
         return Listener.super.onPong(arg0, arg1);
+    }
+
+    @Override
+    public CompletionStage<?> onPing(WebSocket arg0, ByteBuffer arg1) {
+        // TODO Auto-generated method stub
+        System.out.println("Ping received with data: " + new String(arg1.array()));
+        return Listener.super.onPing(arg0, arg1);
     }
 
     public WebSocket startSocket(String connection) {
