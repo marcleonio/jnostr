@@ -134,6 +134,7 @@ public class JnosterTest extends BaseTest {
     @Test
     public void listPubRelay() {
         // Connect to one of the relays and then query for kind 3,10002 events
+        // https://github.com/nostr-protocol/nips/blob/master/65.md
     }
 
     @Test
