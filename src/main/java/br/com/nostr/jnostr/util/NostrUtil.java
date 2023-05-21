@@ -59,6 +59,10 @@ public class NostrUtil {
             throw new RuntimeException(e);
         }
     }
+    
+    public static byte[] genPubKey(String secKey) {
+        return genPubKey(hexToBytes(secKey));
+    }
 
     public static String toHex(byte[] data) {
         StringBuilder sb = new StringBuilder();

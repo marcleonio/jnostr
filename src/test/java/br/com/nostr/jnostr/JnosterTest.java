@@ -296,6 +296,16 @@ public class JnosterTest extends BaseTest {
     }
 
     @Test
+    public void nip09() {
+        // jnostr = new JNostr(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
+        var relays = jnostr.relayInit(TypeRealyEnum.READ_WRITE,"wss://relay.nostr.band","relay.taxi");//read_lony/write_only
+        var events = relays.delete("4616d5996c3ab535de015373346b536f52496eea67a45150c5a10f5b6145730d");
+
+        assertFalse(events.isEmpty());
+
+    }
+
+    @Test
     public void nip02() {
         // petname
     }

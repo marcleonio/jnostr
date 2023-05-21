@@ -202,7 +202,7 @@ class JNostr {
 
     public RelayThread relayInit(TypeRealyEnum realyEnun,String ... relays) {
 
-        return new RelayThread(realyEnun,relays);
+        return new RelayThread(privateKey, realyEnun,relays);
     }
 
     
