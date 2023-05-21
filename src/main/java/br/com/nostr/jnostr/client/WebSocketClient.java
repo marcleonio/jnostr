@@ -54,20 +54,20 @@ public class WebSocketClient implements WebSocket.Listener {
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         // TODO Auto-generated method stub
         // return Listener.super.onText(webSocket, data, last);
+        System.out.println("");
         System.out.println("onText received " + data);
 
+        webSocket.request(1);
         if(last){
             this.data = data.toString();
             this.dataList.add(getData());
-            if(this.data.contains("EOSE")){
+            if(data.toString().contains("EOSE") || !data.toString().substring(data.toString().length() - 1).equals("]") || data.toString().substring(2,4).equals("OK") || data.toString().substring(2,8).equals("NOTICE")){
                 latch.countDown();
-            }else{
-                webSocket.request(1);
             }
         }
 
         return CompletableFuture.completedFuture(data)
-          .thenAccept(o -> System.out.println("Handling data: " + o));
+          .thenAccept(o -> o.toString() /*System.out.println("Handling data: " + o)*/);
 
        
         // return WebSocket.Listener.super.onText(webSocket, data, last);

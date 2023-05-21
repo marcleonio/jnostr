@@ -67,7 +67,7 @@ public class JnosterTest extends BaseTest {
     public void nip01REQ() {
         var data = jnostr.sendMessage(createReqMessage());
 
-        assertEquals("[\"EVENT\"", data.split(",")[0]);
+        assertEquals("[\"EOSE\"", data.split(",")[0]);
     }
 
     @Test
