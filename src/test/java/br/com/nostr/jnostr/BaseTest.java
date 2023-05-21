@@ -15,6 +15,7 @@ import br.com.nostr.jnostr.enums.TypeClientEnum;
 import br.com.nostr.jnostr.enums.TypeReactionEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.CloseMessage;
+import br.com.nostr.jnostr.nip.CountMessage;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
@@ -28,7 +29,7 @@ import jakarta.validation.Valid;
 
 public class BaseTest {
     
-    private String subscriptionId;
+    private String subscriptionId = UUID.randomUUID().toString();
     protected JNostr jnostr;
 
     public String createNIP01() {
@@ -70,7 +71,6 @@ public class BaseTest {
         
 
         ReqMessage message = new ReqMessage();
-        subscriptionId = UUID.randomUUID().toString();
         message.setSubscriptionId(subscriptionId);
         Filters filter = createFilter();
         message.setFilters(filter);
@@ -107,6 +107,34 @@ public class BaseTest {
 
         return message;
     }
+
+    protected Message createFollowersCountMessage(String pubkey) {
+
+        CountMessage message = new CountMessage();
+
+        message.setSubscriptionId(subscriptionId);
+        Filters filter = new Filters();
+        filter.setKinds(Arrays.asList(3));
+        filter.setP(Arrays.asList(pubkey));
+        message.setFilters(filter);
+
+        return message;
+    }
+
+    protected Message createPostsAndReactionsCountMessage(String pubkey) {
+
+        CountMessage message = new CountMessage();
+
+        message.setSubscriptionId(subscriptionId);
+        Filters filter = new Filters();
+        filter.setKinds(Arrays.asList(1,7));
+        filter.setAuthors(Arrays.asList(pubkey));
+        message.setFilters(filter);
+
+        return message;
+    }
+
+    
 
     protected Filters createFilter() {
 

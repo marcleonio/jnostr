@@ -223,6 +223,79 @@ public class JnosterTest extends BaseTest {
     }
 
     @Test
+    public void nip45FollowersCount() throws Exception {
+
+        var latch = new CountDownLatch(1);
+        var list = new ArrayList<String>();
+        var listener = new WebSocket.Listener() {
+            @Override
+            public CompletionStage<Void> onText(WebSocket webSocket, CharSequence data, boolean last) {
+                webSocket.request(1);
+                list.add(data.toString());
+                return CompletableFuture.completedFuture(data)
+                        .thenAccept(o -> {System.out.println("Handling data: " + o); if(o.toString().contains("COUNT") || o.toString().contains("NOTICE")){latch.countDown();} });
+            }
+        };
+
+        var uri = URI.create("wss://relay.nostr.band");
+        var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
+                .buildAsync(uri, listener)
+                .get();
+
+        var messages = new ClientToRelay();
+        ///////////////////////////////////////////////////////////
+
+        var message = createFollowersCountMessage("npub1mf9tx37vdvpyfhckd8xshl5x459ugq0xqggp7gqeqy9d687pgmhsx5705k");
+
+        //////////////////////////////////////////////////////////
+        messages.setMessages(Arrays.asList(message));
+        var json = mapper.writeValueAsString(messages);
+        System.out.println(json);
+        webSocket.sendText(json, true);
+        latch.await();
+
+        assertFalse(list.isEmpty());
+
+    }
+
+    @Test
+    public void nip45PostReactionCount() throws Exception {
+
+        var latch = new CountDownLatch(1);
+        var list = new ArrayList<String>();
+        var listener = new WebSocket.Listener() {
+            @Override
+            public CompletionStage<Void> onText(WebSocket webSocket, CharSequence data, boolean last) {
+                webSocket.request(1);
+                list.add(data.toString());
+                return CompletableFuture.completedFuture(data)
+                        .thenAccept(o -> {System.out.println("Handling data: " + o); if(o.toString().contains("COUNT") || o.toString().contains("NOTICE")){latch.countDown();} });
+            }
+        };
+
+        var uri = URI.create("wss://relay.nostr.band");
+        var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
+                .buildAsync(uri, listener)
+                .get();
+
+        var messages = new ClientToRelay();
+        ///////////////////////////////////////////////////////////
+
+        var message = createPostsAndReactionsCountMessage("da4ab347cc6b0244df1669cd0bfe86ad0bc401e602101f2019010add1fc146ef");
+        
+        //////////////////////////////////////////////////////////
+        messages.setMessages(Arrays.asList(message));
+        var json = mapper.writeValueAsString(messages);
+        System.out.println(json);
+        webSocket.sendText(json, true);
+        latch.await();
+
+
+        assertFalse(list.isEmpty());
+
+    }
+
+    @Test
     public void nip02() {
         // petname
     }
