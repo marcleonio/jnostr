@@ -10,7 +10,7 @@ A nostr client library, written in java, for generating, signing and publishing 
  15. NIP-15
  18. NIP-18
  23. NIP-23
- 25. NIP-25
+ 25. [NIP-25](https://github.com/nostr-protocol/nips/blob/master/25.md)
  58. NIP-58
  28. NIP-28
  42. NIP-42

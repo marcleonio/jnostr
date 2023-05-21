@@ -31,7 +31,10 @@ public class CustomBaseTagSerializer extends JsonSerializer<TagBase>{
 
         for (Field field : allFields){
             try {
-                list.add(BeanUtils.getProperty(value,field.getName()));
+                var getValue = BeanUtils.getProperty(value,field.getName());
+                if(getValue!=null){
+                    list.add(getValue);
+                }
             } catch (IllegalArgumentException | IllegalAccessException | SecurityException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

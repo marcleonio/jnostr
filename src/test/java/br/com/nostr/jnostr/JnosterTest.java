@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
@@ -41,7 +42,7 @@ import static org.awaitility.Awaitility.await;
 public class JnosterTest extends BaseTest {
     // private final StringPadderImpl stringPadder = new StringPadderImpl();
 
-    private JNostr jnostr;
+    private ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
 
     @Before
     public void init() {
@@ -87,7 +88,7 @@ public class JnosterTest extends BaseTest {
 
     @Test
     public void testeReqList() throws Exception {
-        var echoed = new AtomicBoolean(false);
+        var latch = new CountDownLatch(1);
         var list = new ArrayList<String>();
         var listener = new WebSocket.Listener() {
             @Override
@@ -95,7 +96,7 @@ public class JnosterTest extends BaseTest {
                 webSocket.request(1);
                 list.add(data.toString());
                 return CompletableFuture.completedFuture(data)
-                        .thenAccept(o -> {System.out.println("Handling data: " + o); echoed.set(o.toString().contains("EOSE")); });
+                        .thenAccept(o -> {System.out.println("Handling data: " + o); if(o.toString().contains("EOSE")){latch.countDown();}; });
             }
         };
 
@@ -124,7 +125,7 @@ public class JnosterTest extends BaseTest {
 
         webSocket.sendText(json, true);
 
-        await().untilTrue(echoed);
+        latch.await();
 
         assertEquals(11,list.size());
     }
@@ -191,6 +192,35 @@ public class JnosterTest extends BaseTest {
         
     }
 
+    @Test
+    public void nip25() throws Exception {
+        var latch = new CountDownLatch(1);
+        var list = new ArrayList<String>();
+        var listener = new WebSocket.Listener() {
+            @Override
+            public CompletionStage<Void> onText(WebSocket webSocket, CharSequence data, boolean last) {
+                webSocket.request(1);
+                list.add(data.toString());
+                return CompletableFuture.completedFuture(data)
+                        .thenAccept(o -> {System.out.println("Handling data: " + o); if(o.toString().contains("OK") || o.toString().contains("NOTICE")){latch.countDown();} });
+            }
+        };
+
+        var uri = URI.create("wss://relay.taxi");
+        var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
+                .buildAsync(uri, listener)
+                .get();
+
+        var messages = new ClientToRelay();
+        var message = createReactionMessageLike("4616d5996c3ab535de015373346b536f52496eea67a45150c5a10f5b6145730d", "5147c99001e529ace0e321bed39f6cbbf7f012f827f4f35074e46af4507e88b0");
+        messages.setMessages(Arrays.asList(message));
+        var json = mapper.writeValueAsString(messages);
+        System.out.println(json);
+        webSocket.sendText(json, true);
+        latch.await();
+
+        assertFalse(list.isEmpty());
+    }
 
     @Test
     public void nip02() {

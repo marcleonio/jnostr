@@ -15,6 +15,7 @@ import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.CloseMessage;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Message;
+import br.com.nostr.jnostr.nip.ReactionMessage;
 import br.com.nostr.jnostr.nip.ReqMessage;
 
 public class CustomClientSerializer extends JsonSerializer <ClientToRelay>{
@@ -49,6 +50,9 @@ public class CustomClientSerializer extends JsonSerializer <ClientToRelay>{
         if(tagFields[0].getName().equals("filters") ){
             gen.writePOJO( ((ReqMessage) message).getSubscriptionId());
             gen.writePOJO( ((ReqMessage) message).getFilters());
+        } 
+        if(message instanceof ReactionMessage){
+            gen.writePOJO( ((ReactionMessage) message).getEvent());
         }
         else {
             gen.writePOJO( ((CloseMessage) message).getSubscriptionId());

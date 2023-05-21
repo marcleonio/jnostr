@@ -12,13 +12,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.nostr.jnostr.crypto.schnorr.Schnorr;
 import br.com.nostr.jnostr.enums.TypeClientEnum;
+import br.com.nostr.jnostr.enums.TypeReactionEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.CloseMessage;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
+import br.com.nostr.jnostr.nip.ReactionMessage;
 import br.com.nostr.jnostr.nip.Event;
 import br.com.nostr.jnostr.nip.ReqMessage;
+import br.com.nostr.jnostr.tags.TagE;
 import br.com.nostr.jnostr.tags.TagP;
 import br.com.nostr.jnostr.util.NostrUtil;
 import jakarta.validation.Valid;
@@ -26,6 +29,7 @@ import jakarta.validation.Valid;
 public class BaseTest {
     
     private String subscriptionId;
+    protected JNostr jnostr;
 
     public String createNIP01() {
         try {
@@ -50,8 +54,8 @@ public class BaseTest {
         var event = new Event();
 
         event.setKind(1);
-        // nip.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
-        // nip.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
+        // event.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
+        // event.setTags(Arrays.asList(TagP.builder().pubkey(pubkey).recommendedRelayURL("JNostr").build()));
         event.setContent("Hello world, I'm here on JNostr API!");
             
             
@@ -70,6 +74,36 @@ public class BaseTest {
         message.setSubscriptionId(subscriptionId);
         Filters filter = createFilter();
         message.setFilters(filter);
+
+        return message;
+    }
+
+    protected Message createReactionMessageLike(String refIdEvent, String refPubkey) {
+
+        ReactionMessage message = new ReactionMessage();
+
+        var event = new Event();
+
+        event.setKind(7);
+        event.setContent(TypeReactionEnum.LIKE.getValue());
+
+        event.setTags(Arrays.asList(TagE.builder().idAnotherEvent(refIdEvent).build()));
+        event.setTags(Arrays.asList(TagP.builder().pubkey(refPubkey).build()));
+
+        message.setEvent(event);
+
+        if(message instanceof ReactionMessage){
+            event = ((ReactionMessage)message).getEvent();
+            event.setCreatedAt(Instant.now().getEpochSecond());
+
+            byte[] privkey = NostrUtil.hexToBytes(jnostr.privateKey);
+            String pubkey = NostrUtil.bigIntFromBytes(NostrUtil.genPubKey(privkey)).toString(16);
+            event.setPubkey(pubkey);
+            event.setId(NostrUtil.bytesToHex(NostrUtil.sha256(event.serialize())));
+            var signed = Schnorr.sign(NostrUtil.sha256(event.serialize()), privkey, NostrUtil.createRandomByteArray(32));
+            event.setSig(NostrUtil.bytesToHex(signed));
+
+        }
 
         return message;
     }

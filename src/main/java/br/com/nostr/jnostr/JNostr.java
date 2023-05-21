@@ -35,6 +35,7 @@ import br.com.nostr.jnostr.enums.TypeRealyEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Message;
+import br.com.nostr.jnostr.nip.ReactionMessage;
 import br.com.nostr.jnostr.nip.Event;
 import br.com.nostr.jnostr.nip.ReqMessage;
 import br.com.nostr.jnostr.server.RelayInfo;
@@ -49,7 +50,7 @@ class JNostr {
     
     private WebSocketClient wsc = new WebSocketClient();
     private WebSocket connectedRelay;
-    private String privateKey;
+    String privateKey;//visibily pakage
     private String[] relays;
 
     public JNostr(String privateKey){
@@ -180,6 +181,18 @@ class JNostr {
 
             var signed = Schnorr.sign(NostrUtil.sha256(event.serialize()), privkey, NostrUtil.createRandomByteArray(32));
             event.setSig(NostrUtil.bytesToHex(signed));
+        }
+        if(message instanceof ReactionMessage){
+            var event = ((ReactionMessage)message).getEvent();
+            event.setCreatedAt(Instant.now().getEpochSecond());
+
+            byte[] privkey = NostrUtil.hexToBytes(privateKey);
+            String pubkey = NostrUtil.bigIntFromBytes(NostrUtil.genPubKey(privkey)).toString(16);
+            event.setPubkey(pubkey);
+            event.setId(NostrUtil.bytesToHex(NostrUtil.sha256(event.serialize())));
+            var signed = Schnorr.sign(NostrUtil.sha256(event.serialize()), privkey, NostrUtil.createRandomByteArray(32));
+            event.setSig(NostrUtil.bytesToHex(signed));
+
         }
 
 
