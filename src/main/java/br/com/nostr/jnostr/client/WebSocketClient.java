@@ -5,6 +5,8 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
@@ -16,6 +18,7 @@ import lombok.Getter;
 public class WebSocketClient implements WebSocket.Listener {
 
     private String data;
+    private List<String> dataList;
     private CountDownLatch latch;
 
     @Override
@@ -55,6 +58,7 @@ public class WebSocketClient implements WebSocket.Listener {
 
         if(last){
             this.data = data.toString();
+            this.dataList.add(getData());
             if(this.data.contains("EOSE")){
                 latch.countDown();
             }else{
@@ -96,6 +100,7 @@ public class WebSocketClient implements WebSocket.Listener {
                 URI.create(connection), this);
                 latch = new CountDownLatch(1);
                 this.data = null;
+                this.dataList = new ArrayList<>();
         return server_cf.join();
     }
 

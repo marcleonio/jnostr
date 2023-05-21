@@ -1,6 +1,7 @@
 package br.com.nostr.jnostr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 import java.net.URI;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.nostr.jnostr.nip.ClientToRelay;
+import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
 import br.com.nostr.jnostr.nip.ReqMessage;
 import br.com.nostr.jnostr.server.RelayToClient;
@@ -97,7 +99,7 @@ public class JnosterTest extends BaseTest {
                 .buildAsync(uri, listener)
                 .get();
 
-
+                
         var messages = new ClientToRelay();
         var message = createReqMessage();
         messages.setMessages(Arrays.asList(message));
@@ -120,6 +122,15 @@ public class JnosterTest extends BaseTest {
         await().untilTrue(echoed);
 
         assertEquals(11,list.size());
+    }
+
+    @Test
+    public void testManyRelay() {
+        // jnostr = new JNostr(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
+        var relays = jnostr.relayInit("wss://relay.nostr.band","relay.taxi");
+        var events = relays.list(createFilter());
+
+        assertFalse(events.isEmpty());
     }
 
     @Test

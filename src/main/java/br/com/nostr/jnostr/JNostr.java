@@ -13,14 +13,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.nostr.jnostr.client.RelayThread;
 import br.com.nostr.jnostr.client.WebSocketClient;
 import br.com.nostr.jnostr.crypto.schnorr.Schnorr;
 import br.com.nostr.jnostr.enums.TypeClientEnum;
@@ -177,6 +184,11 @@ class JNostr {
 
         messages.setMessages(Arrays.asList(message));
         return sendMessage(messages);
+    }
+
+    public RelayThread relayInit(String ... relays) {
+
+        return new RelayThread(relays);
     }
 
     

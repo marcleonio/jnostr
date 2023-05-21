@@ -63,6 +63,19 @@ public class BaseTest {
     @Valid
     protected Message createReqMessage() {
 
+        
+
+        ReqMessage message = new ReqMessage();
+        subscriptionId = UUID.randomUUID().toString();
+        message.setSubscriptionId(subscriptionId);
+        Filters filter = createFilter();
+        message.setFilters(filter);
+
+        return message;
+    }
+
+    protected Filters createFilter() {
+
         Instant now = Instant.now();
         var now1 = TimeUnit.SECONDS.convert(now.toEpochMilli(), TimeUnit.MILLISECONDS) - 60;
         var now2 = TimeUnit.SECONDS.convert(now.minusSeconds(60).toEpochMilli(), TimeUnit.MILLISECONDS);
@@ -73,17 +86,12 @@ public class BaseTest {
         Long fromDate = LocalDateTime.now(ZoneOffset.UTC).minusDays(30).toEpochSecond(ZoneOffset.UTC);
         Long toDate = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(60).toEpochSecond(ZoneOffset.UTC);
 
-        ReqMessage message = new ReqMessage();
-        subscriptionId = UUID.randomUUID().toString();
-        message.setSubscriptionId(subscriptionId);
         Filters filter = new Filters();
         filter.setKinds(Arrays.asList(1));
         filter.setSince(fromDate);
         filter.setUntil(toDate);
         filter.setLimit(10);
-        message.setFilters(filter);
-
-        return message;
+        return filter;
     }
 
     @Valid

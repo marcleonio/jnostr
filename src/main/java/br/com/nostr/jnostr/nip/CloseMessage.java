@@ -16,4 +16,9 @@ public class CloseMessage extends Message {
         return TypeClientEnum.CLOSE;
     }
 
+    // @JsonValue
+    // public String toJson(){
+    //     return TypeClientEnum.CLOSE+","+this.subscriptionId;
+    // }
+
 }
