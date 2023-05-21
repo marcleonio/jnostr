@@ -4,11 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -26,6 +31,7 @@ import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
 import br.com.nostr.jnostr.nip.ReqMessage;
+import br.com.nostr.jnostr.server.RelayInfo;
 import br.com.nostr.jnostr.server.RelayToClient;
 import br.com.nostr.jnostr.util.NostrUtil;
 import jakarta.validation.Valid;
@@ -45,7 +51,7 @@ public class JnosterTest extends BaseTest {
     @Test
     public void relayInfo() {
         var body = jnostr.relayInfo("relay.nostr.band");
-
+        System.out.println(body);
         assertEquals(body.getSupportedNips().get(0), Integer.valueOf(1));
 
     }
@@ -132,10 +138,58 @@ public class JnosterTest extends BaseTest {
     }
 
     @Test
-    public void listPubRelay() {
+    public void listPubRelay() throws Exception {
         // Connect to one of the relays and then query for kind 3,10002 events
         // https://github.com/nostr-protocol/nips/blob/master/65.md
+
+        // String json = "[\"EVENT\",{\"kind\": 10002, \"content\": \"\"}]";
+        // var echoed = new AtomicBoolean(false);
+        // var listener = new WebSocket.Listener() {
+        //     @Override
+        //     public CompletionStage<Void> onText(WebSocket webSocket, CharSequence data, boolean last) {
+        //         webSocket.request(1);
+        //         return CompletableFuture.completedFuture(data)
+        //                 .thenAccept(o -> {System.out.println("Handling data: " + o); echoed.set(o.toString().contains("EOSE")); });
+        //     }
+        // };
+
+
+        // var uri = URI.create("wss://relay.taxi");
+        // var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
+        //         .buildAsync(uri, listener)
+        //         .get();
+
+        // webSocket.sendText(json, true);
+
+        // await().untilTrue(echoed);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HttpResponse<String> response = null;
+        try {
+
+            HttpRequest request = HttpRequest.newBuilder()
+            .uri(new URI("https://nostr.watch/geo.json"))
+            .GET()
+            .build();
+
+            response = HttpClient.newHttpClient()
+            .send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+            var list = mapper.readValue(response.body(), LinkedHashMap.class);
+
+            List<String> relayList = new ArrayList<>();
+            for (Object item : list.keySet()) {
+                relayList.add(item.toString());
+            }
+
+            assertFalse(relayList.isEmpty());
+
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        
     }
+
 
     @Test
     public void nip02() {
