@@ -52,6 +52,9 @@ public class CustomBaseTagDeSerializer extends StdDeserializer<TagBase> {
                     tagP.setId(arrNode.get(i).asText());
                 }
                 if(i == 1){
+                    tagP.setPubkey(arrNode.get(i).asText());
+                }
+                if(i == 2){
                     tagP.setRecommendedRelayURL(arrNode.get(i).asText());
                 }
             }

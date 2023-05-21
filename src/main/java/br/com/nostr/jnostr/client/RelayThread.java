@@ -94,7 +94,7 @@ public class RelayThread  {
                     }
                 };
 
-                var uri = URI.create(relay.contains("ws")?relay:("wss://"+relay));
+                var uri = URI.create(relay.startsWith("ws")?relay:("wss://"+relay));
                 var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
                 .buildAsync(uri, listener)
                 .get();

@@ -34,8 +34,6 @@ import static org.awaitility.Awaitility.await;
 public class JnosterTest extends BaseTest {
     // private final StringPadderImpl stringPadder = new StringPadderImpl();
 
-    private String jsonNIP01;
-
     private JNostr jnostr;
 
     @Before
@@ -131,6 +129,11 @@ public class JnosterTest extends BaseTest {
         var events = relays.list(createFilter());
 
         assertFalse(events.isEmpty());
+    }
+
+    @Test
+    public void listPubRelay() {
+        // Connect to one of the relays and then query for kind 3,10002 events
     }
 
     @Test
