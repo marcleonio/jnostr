@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
+import br.com.nostr.jnostr.enums.TypeRealyEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.Event;
 import br.com.nostr.jnostr.nip.Filters;
@@ -35,15 +36,27 @@ import jakarta.validation.Valid;
 
 public class RelayThread  {
 
-    private String[] relays;
+    // private String[] relays;
     // private List<?> result;
     private CountDownLatch latch;
     private String subscriptionId;
     private ExecutorService executorService;
+    private String[] relaysWrite;
+    private String[] relaysRead;
     
 
-    public RelayThread(String...relays) {
-        this.relays = relays;
+    public RelayThread(TypeRealyEnum realyEnun,String...relays) {
+        if(realyEnun.equals(TypeRealyEnum.READ_WRITE)){
+            this.relaysWrite = relays;
+            this.relaysRead = relays;
+            // this.relays = relays;
+        }
+        if(realyEnun.equals(TypeRealyEnum.READ_ONLY)){
+            this.relaysRead = relays;
+        }
+        if(realyEnun.equals(TypeRealyEnum.WRITE_ONLY)){
+            this.relaysWrite = relays;
+        }
         this.executorService = Executors.newFixedThreadPool(relays.length);
     }
 
@@ -68,7 +81,7 @@ public class RelayThread  {
         List<Callable<List<Event>>> callableTasks = new ArrayList<>();
         this.subscriptionId = UUID.randomUUID().toString();
 
-        for (String relay : relays) {
+        for (String relay : relaysRead) {
             Callable<List<Event>> callableTask = () -> {
                 
                 var listEvent = new ArrayList<Event>();

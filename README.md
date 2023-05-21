@@ -14,6 +14,7 @@ A nostr client library, written in java, for generating, signing and publishing 
  58. NIP-58
  28. NIP-28
  42. NIP-42
+ 45. NIP-45
  46. NIP-46
  47. NIP-47
  51. NIP-51

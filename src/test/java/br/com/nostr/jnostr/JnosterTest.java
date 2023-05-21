@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.nostr.jnostr.enums.TypeRealyEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
@@ -131,7 +132,7 @@ public class JnosterTest extends BaseTest {
     @Test
     public void testManyRelay() {
         // jnostr = new JNostr(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
-        var relays = jnostr.relayInit("wss://relay.nostr.band","relay.taxi");
+        var relays = jnostr.relayInit(TypeRealyEnum.READ_ONLY,"wss://relay.nostr.band","relay.taxi");//read_lony/write_only
         var events = relays.list(createFilter());
 
         assertFalse(events.isEmpty());

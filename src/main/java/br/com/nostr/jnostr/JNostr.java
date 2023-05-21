@@ -31,6 +31,7 @@ import br.com.nostr.jnostr.client.RelayThread;
 import br.com.nostr.jnostr.client.WebSocketClient;
 import br.com.nostr.jnostr.crypto.schnorr.Schnorr;
 import br.com.nostr.jnostr.enums.TypeClientEnum;
+import br.com.nostr.jnostr.enums.TypeRealyEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
 import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Message;
@@ -186,9 +187,9 @@ class JNostr {
         return sendMessage(messages);
     }
 
-    public RelayThread relayInit(String ... relays) {
+    public RelayThread relayInit(TypeRealyEnum realyEnun,String ... relays) {
 
-        return new RelayThread(relays);
+        return new RelayThread(realyEnun,relays);
     }
 
     

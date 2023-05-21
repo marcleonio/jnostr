@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @JsonDeserialize(using=CustomBaseTagDeSerializer.class)
 public abstract class TagBase {
 
-    @Size(max=1)
+    @Size(max=16)
     protected String id;
 
     public abstract String getId();
