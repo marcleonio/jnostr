@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import br.com.nostr.jnostr.tags.TagBase;
 import br.com.nostr.jnostr.tags.TagE;
 import br.com.nostr.jnostr.tags.TagP;
+import br.com.nostr.jnostr.tags.TagSubject;
 
 public class CustomBaseTagDeSerializer extends StdDeserializer<TagBase> {
 
@@ -59,6 +60,18 @@ public class CustomBaseTagDeSerializer extends StdDeserializer<TagBase> {
                 }
             }
             result = tagP;
+        }
+        if(arrNode.get(0).asText().equals("subject")){
+            var tagSubject = new TagSubject();
+            for (int i = 0; i < arrNode.size(); i++) {
+                if(i == 0){
+                    tagSubject.setId(arrNode.get(i).asText());
+                }
+                if(i == 1){
+                    tagSubject.setValue(arrNode.get(i).asText());
+                }
+            }
+            result = tagSubject;
         }
 
         if(arrNode.get(0).asText().equals("imeta")){
