@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @JsonSerialize(using=CustomBaseTagSerializer.class)
 @JsonDeserialize(using=CustomBaseTagDeSerializer.class)
 public abstract class TagBase {

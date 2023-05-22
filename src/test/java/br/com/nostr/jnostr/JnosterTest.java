@@ -306,6 +306,11 @@ public class JnosterTest extends BaseTest {
     }
 
     @Test
+    public void nip18() {
+        // petname
+    }
+
+    @Test
     public void nip02() {
         // petname
     }
