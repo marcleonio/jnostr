@@ -96,7 +96,7 @@ public class BaseTest {
             event = ((ReactionMessage)message).getEvent();
             event.setCreatedAt(Instant.now().getEpochSecond());
 
-            byte[] privkey = NostrUtil.hexToBytes(jnostr.privateKey);
+            byte[] privkey = NostrUtil.hexToBytes(jnostr.getPrivateKey());
             String pubkey = NostrUtil.bigIntFromBytes(NostrUtil.genPubKey(privkey)).toString(16);
             event.setPubkey(pubkey);
             event.setId(NostrUtil.bytesToHex(NostrUtil.sha256(event.serialize())));

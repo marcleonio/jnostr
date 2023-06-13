@@ -3,6 +3,8 @@ package br.com.nostr.jnostr;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+// import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,12 +15,16 @@ import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,11 +36,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.nostr.jnostr.enums.TypeRealyEnum;
 import br.com.nostr.jnostr.nip.ClientToRelay;
+import br.com.nostr.jnostr.nip.Event;
 import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
 import br.com.nostr.jnostr.nip.ReqMessage;
+import br.com.nostr.jnostr.nip.Respost;
 import br.com.nostr.jnostr.server.RelayInfo;
 import br.com.nostr.jnostr.server.RelayToClient;
+import br.com.nostr.jnostr.tags.TagE;
+import br.com.nostr.jnostr.tags.TagP;
 import br.com.nostr.jnostr.util.NostrUtil;
 import jakarta.validation.Valid;
 import static org.awaitility.Awaitility.await;
@@ -46,8 +56,8 @@ public class JnosterTest extends BaseTest {
 
     @Before
     public void init() {
-        jnostr = new JNostr(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
-        jnostr.initialize("relay.taxi");
+        jnostr = new JNostrImpl(NostrUtil.toHex(NostrUtil.generatePrivateKey()));
+        jnostr.initialize("relay.nostr.band");
     }
 
     @Test
@@ -100,7 +110,7 @@ public class JnosterTest extends BaseTest {
             }
         };
 
-        var uri = URI.create("wss://relay.taxi");
+        var uri = URI.create("wss://relay.nostr.band");
         var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
                 .buildAsync(uri, listener)
                 .get();
@@ -206,7 +216,7 @@ public class JnosterTest extends BaseTest {
             }
         };
 
-        var uri = URI.create("wss://relay.taxi");
+        var uri = URI.create("wss://relay.nostr.band");
         var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
                 .buildAsync(uri, listener)
                 .get();
@@ -307,11 +317,23 @@ public class JnosterTest extends BaseTest {
 
     @Test
     public void nip18() {
-        // petname
+        var relays = jnostr.relayInit(TypeRealyEnum.READ_WRITE,"wss://relay.nostr.band","relay.taxi");
+
+        relays.send(new Event());
+        // relays.repost(new Event());
+
+        var r = Respost.builder().idNoteOriginal("null").relayOrigin("null").pubkey("null");
+        relays.repost("refnotaOriginal","relay onde achou a nota","pubkey do evento repostado");
+        relays.repost(r);
+
+       TagE.builder().idAnotherEvent("refnotaOriginal").recommendedRelayURL("relay onde achou a nota");
+       TagP.builder().pubkey("pubkey do evento repostado");
     }
+
 
     @Test
     public void nip02() {
         // petname
     }
+
 }

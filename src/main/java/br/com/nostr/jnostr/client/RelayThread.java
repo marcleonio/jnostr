@@ -35,6 +35,7 @@ import br.com.nostr.jnostr.nip.EventMessage;
 import br.com.nostr.jnostr.nip.Filters;
 import br.com.nostr.jnostr.nip.Message;
 import br.com.nostr.jnostr.nip.ReqMessage;
+import br.com.nostr.jnostr.nip.Respost.RespostBuilder;
 import br.com.nostr.jnostr.tags.TagE;
 import br.com.nostr.jnostr.util.NostrUtil;
 import jakarta.validation.Valid;
@@ -196,6 +197,7 @@ public class RelayThread  {
                 System.out.println(json);
                 webSocket.sendText(json, true);
 
+                latch.await();
                 return listEvent;
             };
 
@@ -247,6 +249,61 @@ public class RelayThread  {
 
         return message;
 
+    }
+
+    public void send(Event event) {
+        var latch = new CountDownLatch(1);
+        var list = new ArrayList<String>();
+        var listener = new WebSocket.Listener() {
+            @Override
+            public CompletionStage<Void> onText(WebSocket webSocket, CharSequence data, boolean last) {
+                webSocket.request(1);
+                list.add(data.toString());
+                return CompletableFuture.completedFuture(data)
+                        .thenAccept(o -> {System.out.println("Handling data: " + o); if(o.toString().contains("COUNT") || o.toString().contains("NOTICE")){latch.countDown();} });
+            }
+        };
+
+
+    }
+
+    public void repost(RespostBuilder r) {
+        // var latch = new CountDownLatch(1);
+        // var list = new ArrayList<String>();
+        // var listener = new WebSocket.Listener() {
+        //     @Override
+        //     public CompletionStage<Void> onText(WebSocket webSocket, CharSequence data, boolean last) {
+        //         webSocket.request(1);
+        //         list.add(data.toString());
+        //         return CompletableFuture.completedFuture(data)
+        //                 .thenAccept(o -> {System.out.println("Handling data: " + o); if(o.toString().contains("COUNT") || o.toString().contains("NOTICE")){latch.countDown();} });
+        //     }
+        // };
+
+        
+
+        
+
+        // var uri = URI.create("wss://relay.nostr.band");
+        // var webSocket = HttpClient.newHttpClient().newWebSocketBuilder()
+        //         .buildAsync(uri, listener)
+        //         .get();
+
+        // var messages = new ClientToRelay();
+        // ///////////////////////////////////////////////////////////
+
+        // var message = createPostsAndReactionsCountMessage("da4ab347cc6b0244df1669cd0bfe86ad0bc401e602101f2019010add1fc146ef");
+        
+        // //////////////////////////////////////////////////////////
+        // messages.setMessages(Arrays.asList(message));
+        // var json = mapper.writeValueAsString(messages);
+        // System.out.println(json);
+        // webSocket.sendText(json, true);
+        // latch.await();
+
+    }
+
+    public void repost(String string, String string2, String string3) {
     }
 
     

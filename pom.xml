@@ -4,9 +4,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>br.com.nostr.jnostr</groupId>
+  <groupId>io.github.marcleonio</groupId>
   <artifactId>jnostr</artifactId>
-  <version>1.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <name>jnostr</name>
   <description>
@@ -101,6 +101,13 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -110,6 +117,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <skipTests>true</skipTests>
   </properties>
 
   <dependencies>

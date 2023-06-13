@@ -1,4 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Fri May 19 09:56:25 BRT 2023
-http\://repositorios.celepar.parana/repository/maven/.error=Could not transfer artifact com.fasterxml.jackson.core\:jackson-databind\:pom\:2.15.0 from/to central (http\://repositorios.celepar.parana/repository/maven/)\: repositorios.celepar.parana
-@default-central-http\://repositorios.celepar.parana/repository/maven/.lastUpdated=1684500985492

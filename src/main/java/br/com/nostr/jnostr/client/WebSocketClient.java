@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 import br.com.nostr.jnostr.util.NostrUtil;
 import lombok.Getter;
@@ -101,7 +102,16 @@ public class WebSocketClient implements WebSocket.Listener {
                 latch = new CountDownLatch(1);
                 this.data = null;
                 this.dataList = new ArrayList<>();
-        return server_cf.join();
+        try {
+            return server_cf.get();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void setLatch(CountDownLatch countDownLatch) {

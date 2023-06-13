@@ -15,7 +15,7 @@ public class JNostrFactory {
      */
     public static JNostr getInstance(String privateKey) {
         Objects.requireNonNull(privateKey, "null private key");
-        return new JNostr(privateKey).initialize(privateKey);
+        return new JNostrImpl(privateKey).initialize(null);
     }
 
     /**
@@ -25,6 +25,6 @@ public class JNostrFactory {
      */
     public static JNostr getInstance(String privateKey, String ... relay) {
         Objects.requireNonNull(privateKey, "null private key");
-        return new JNostr(privateKey).initialize(relay);
+        return new JNostrImpl(privateKey).initialize(relay);
     }
 }
